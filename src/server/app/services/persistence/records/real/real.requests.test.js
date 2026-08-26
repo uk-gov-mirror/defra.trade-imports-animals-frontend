@@ -85,6 +85,8 @@ describe('real records adapter — canonical fulfilment boundary', () => {
       createdAt,
       submittedAt: null,
       concurrencyToken: 0,
+      // A draft resolves its addresses live, so it carries no freeze.
+      frozenParties: null,
       fulfilment: {}
     })
   })
