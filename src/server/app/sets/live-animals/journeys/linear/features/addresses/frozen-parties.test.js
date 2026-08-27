@@ -85,6 +85,19 @@ describe('frozenPartiesOf', () => {
     expect(parties.placeOfDestination).toBeUndefined()
   })
 
+  it('Should render a frozen party that carries only a name', () => {
+    // placeOfOrigin and the consignment contact are entered inline in the
+    // journey, so a freeze can hold a party with no address block and no
+    // addressId behind it. It still has to render rather than throw.
+    const { consignor } = frozenPartiesOf({ consignor: { name: 'Bare Name' } })
+
+    expect(consignor.name).toBe('Bare Name')
+    expect(consignor.id).toBeNull()
+    // An address block is still built, just an empty one — the party row reads
+    // it unconditionally, so a missing block must not blow up the render.
+    expect(Object.values(consignor.address).filter(Boolean)).toEqual([])
+  })
+
   it('Should treat a nameless party as not provided', () => {
     const parties = frozenPartiesOf({ consignor: { addressId: 'orphan' } })
 
