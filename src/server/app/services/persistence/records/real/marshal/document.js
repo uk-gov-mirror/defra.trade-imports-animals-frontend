@@ -14,8 +14,16 @@ export const marshal = (document) => {
     // notification, which renders from them instead of resolving its address
     // references live. A draft or an in-flight amendment is meant to reflect
     // address edits, so it resolves and this stays null.
+    //
+    // `submittedNotificationBaseline` is the backend's own field name, exposed
+    // by NotificationFulfilmentsView. It is a cross-repo contract that nothing
+    // here can typecheck: if the backend renames the field, this silently reads
+    // undefined and every submitted notification quietly falls back to a live
+    // resolve. Only E2E catches that.
     frozenParties:
-      status === SUBMITTED ? (document.submittedBaseline ?? null) : null,
+      status === SUBMITTED
+        ? (document.submittedNotificationBaseline ?? null)
+        : null,
     // Engine-facing key stays as `fulfilment` (a UUID-keyed map);
     // wire read uses the renamed `fulfilments` list. See follow-up ticket for
     // the engine-facing rename.

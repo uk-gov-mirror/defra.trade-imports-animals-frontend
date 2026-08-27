@@ -16,13 +16,19 @@ const wireDocument = (overrides = {}) => ({
   ...overrides
 })
 
+/** These fixtures encode the backend's wire shape, so they are a local copy of a
+ * contract owned elsewhere (NotificationFulfilmentsView). They can pass happily
+ * while the real contract has moved on — which is exactly what happened when the
+ * backend renamed this field to `submittedNotificationBaseline` and the marshal
+ * kept reading the old name. Keep them honest against that projection; only E2E
+ * proves the two sides actually pair up. */
 describe('the real records marshal', () => {
   it('Should carry the frozen parties for a submitted notification', () => {
     const record = marshal(
       wireDocument({
         status: 'SUBMITTED',
         submittedAt: '2026-08-01T10:00:00',
-        submittedBaseline: FROZEN_PARTIES
+        submittedNotificationBaseline: FROZEN_PARTIES
       })
     )
 
@@ -35,7 +41,10 @@ describe('the real records marshal', () => {
     expect(marshal(wireDocument({ status: 'DRAFT' })).frozenParties).toBeNull()
     expect(
       marshal(
-        wireDocument({ status: 'AMEND', submittedBaseline: FROZEN_PARTIES })
+        wireDocument({
+          status: 'AMEND',
+          submittedNotificationBaseline: FROZEN_PARTIES
+        })
       ).frozenParties
     ).toBeNull()
   })
